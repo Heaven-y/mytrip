@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import useHomeStore from '@/stores/modules/home'
+import useMainStore from '@/stores/modules/main'
 import { formatMonthDay, getDiffDay } from '@/utils/format-date'
 
+const router = useRouter()
+function cityClick() {
+  router.push('/city')
+}
 function getPosition() {
   navigator.geolocation.getCurrentPosition(
     (res) => {
@@ -20,27 +26,31 @@ function getPosition() {
 const homeStore = useHomeStore()
 const { hotSuggests } = storeToRefs(homeStore)
 
-const newDate = new Date()
-const oldDate = new Date().setDate(newDate.getDate() + 1)
-const startDate = ref(formatMonthDay(newDate))
-const endDate = ref(formatMonthDay(oldDate))
+const mainStore = useMainStore()
+const { nowDate, newDate, currentCity } = storeToRefs(mainStore)
+const startDate = computed(() => formatMonthDay(nowDate.value))
+const endDate = computed(() => formatMonthDay(newDate.value))
 const stay = ref(1)
 const calendarShow = ref(false)
 function calendarConfirm(value: Date[]) {
   const selectSDate = value[0]
   const selectEDate = value[1]
-  startDate.value = formatMonthDay(selectSDate)
-  endDate.value = formatMonthDay(selectEDate)
+  nowDate.value = selectSDate
+  newDate.value = selectEDate
   stay.value = getDiffDay(selectSDate, selectEDate)
 
   calendarShow.value = false
+}
+
+function searchClick() {
+  console.log('点击了搜索')
 }
 </script>
 
 <template>
   <div class="search-box">
     <div class="section location bottom-gray-line">
-      <div class="city">广州</div>
+      <div class="city" @click="cityClick">{{ currentCity.cityName }}</div>
       <div class="position" @click="getPosition">
         <span class="text">我的位置</span>
         <img src="@/assets/img/home/icon_location.png" />
@@ -85,7 +95,7 @@ function calendarConfirm(value: Date[]) {
       </template>
     </div>
     <div class="section search-btn">
-      <button class="btn">开始搜索</button>
+      <button class="btn" @click="searchClick">开始搜索</button>
     </div>
   </div>
 </template>

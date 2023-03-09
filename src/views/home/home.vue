@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, computed, onMounted, onUnmounted, onActivated } from 'vue'
 import { throttle } from 'lodash'
+import SearchBar from '@/components/search-bar/search-bar.vue'
+import useHomeStore from '@/stores/modules/home'
 import HomeSearchBox from './c-cpns/home-search-box.vue'
 import HomeCategories from './c-cpns/home-categories.vue'
 import HomeContent from './c-cpns/home-content.vue'
-import useHomeStore from '@/stores/modules/home'
 
 const homeStore = useHomeStore()
 homeStore.fetchHomeSuggest()
@@ -43,10 +44,18 @@ watch(isReachBottom, (newValue) => {
     })
   }
 })
+
+onActivated(() => {
+  homeRef.value?.scrollTo({ top: scrollTop.value })
+})
+const isShowSearchBar = computed(() => {
+  return scrollTop.value > 360
+})
 </script>
 
 <template>
   <div class="home" ref="homeRef">
+    <search-bar v-show="isShowSearchBar" />
     <van-nav-bar title="晴天旅途" class="nav-bar" />
     <div class="banner">
       <img src="@/assets/img/home/banner.webp" />
@@ -59,7 +68,6 @@ watch(isReachBottom, (newValue) => {
 
 <style scoped lang="less">
 .home {
-  --van-nav-bar-title-text-color: var(--primary-color);
   padding-bottom: 60px;
   height: 100vh;
   box-sizing: border-box;

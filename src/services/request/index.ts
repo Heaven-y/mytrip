@@ -1,7 +1,9 @@
 import axios from 'axios'
+import useMainStore from '@/stores/modules/main'
 import type { AxiosInstance } from 'axios'
 import type { MYRequestConfig } from './type'
 
+const mainStore = useMainStore()
 class MYRequest {
   instance: AxiosInstance
   constructor(config: MYRequestConfig) {
@@ -10,6 +12,7 @@ class MYRequest {
     // 全局拦截器
     this.instance.interceptors.request.use(
       (config) => {
+        mainStore.isLoading = true
         return config
       },
       (err) => {
@@ -18,6 +21,7 @@ class MYRequest {
     )
     this.instance.interceptors.response.use(
       (res) => {
+        mainStore.isLoading = false
         const data = res.data
         // 取到data后
         // .request<any, AxiosResponse>(config)
@@ -25,6 +29,7 @@ class MYRequest {
         return data
       },
       (err) => {
+        mainStore.isLoading = false
         return err
       }
     )
