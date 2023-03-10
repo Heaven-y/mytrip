@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { throttle } from 'lodash'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import useDetailStore from '@/stores/modules/detail'
+import useScroll from '@/hooks/useScroll'
 
 import TabControl from '@/components/tab-control/tab-control.vue'
 import DetailSwipe from './c-cpns/detail-01-swipe.vue'
@@ -44,26 +44,7 @@ function getRef(el: Element | ComponentPublicInstance | null) {
 
 const detailRef = ref<VNodeRef | undefined>()
 const controlRef = ref<InstanceType<typeof TabControl>>()
-const clientHeight = ref(0)
-const scrollHeight = ref(0)
-const scrollTop = ref(0)
-let el: Element
-const handleScroll = throttle(
-  () => {
-    clientHeight.value = el.clientHeight
-    scrollHeight.value = el.scrollHeight
-    scrollTop.value = el.scrollTop
-  },
-  300,
-  { trailing: true }
-)
-onMounted(() => {
-  el = detailRef.value! as any
-  el.addEventListener('scroll', handleScroll)
-})
-onUnmounted(() => {
-  el.removeEventListener('scroll', handleScroll)
-})
+const { scrollTop } = useScroll(detailRef)
 let isClick = false
 let currentDistance = 0
 const isControlShow = computed(() => {
@@ -89,6 +70,7 @@ function tabClick(index: number) {
   isClick = true
   currentDistance = distance
 
+  const el: HTMLDivElement = detailRef.value as any
   el.scrollTo({
     top: distance,
     behavior: 'smooth'

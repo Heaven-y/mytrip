@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, onUnmounted, onActivated } from 'vue'
-import { throttle } from 'lodash'
+import { ref, watch, computed, onActivated } from 'vue'
 import SearchBar from '@/components/search-bar/search-bar.vue'
 import useHomeStore from '@/stores/modules/home'
 import HomeSearchBox from './c-cpns/home-search-box.vue'
 import HomeCategories from './c-cpns/home-categories.vue'
 import HomeContent from './c-cpns/home-content.vue'
+import useScroll from '@/hooks/useScroll'
 
 const homeStore = useHomeStore()
 homeStore.fetchHomeSuggest()
@@ -13,30 +13,7 @@ homeStore.fetchHomeCategories()
 homeStore.fetchHomeHouseList()
 
 const homeRef = ref<HTMLDivElement>()
-const isReachBottom = ref(false)
-const clientHeight = ref(0)
-const scrollHeight = ref(0)
-const scrollTop = ref(0)
-let el = homeRef.value!
-const handleScroll = throttle(
-  () => {
-    clientHeight.value = el.clientHeight
-    scrollHeight.value = el.scrollHeight
-    scrollTop.value = el.scrollTop
-    if (clientHeight.value + scrollTop.value >= scrollHeight.value) {
-      isReachBottom.value = true
-    }
-  },
-  400,
-  { trailing: true }
-)
-onMounted(() => {
-  el = homeRef.value!
-  el.addEventListener('scroll', handleScroll)
-})
-onUnmounted(() => {
-  el.removeEventListener('scroll', handleScroll)
-})
+const { isReachBottom, scrollTop } = useScroll(homeRef)
 watch(isReachBottom, (newValue) => {
   if (newValue) {
     homeStore.fetchHomeHouseList().then(() => {
