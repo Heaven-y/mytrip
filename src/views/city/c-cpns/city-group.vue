@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import useMainStore from '@/stores/modules/main'
+import useGoBack from '@/hooks/useGoback'
 import type { CityGroup, CityGroupOverSea } from '@/stores/types/city'
 
 const props = defineProps<{
@@ -14,11 +14,9 @@ const indexList = computed(() => {
 })
 
 const mainStore = useMainStore()
-const router = useRouter()
-function cityClick(city: any) {
+const backClick = useGoBack(false, (city) => {
   mainStore.currentCity = city
-  router.back()
-}
+})
 </script>
 
 <template>
@@ -27,14 +25,14 @@ function cityClick(city: any) {
       <van-index-anchor index="热门" />
       <div class="list">
         <template v-for="city in groupData.hotCities" :key="city.cityId">
-          <div class="city" @click="cityClick(city)">{{ city.cityName }}</div>
+          <div class="city" @click="backClick(city)">{{ city.cityName }}</div>
         </template>
       </div>
 
       <template v-for="group in groupData.cities" :key="group.group">
         <van-index-anchor :index="group.group" />
         <template v-for="city in group.cities" :key="city.cityId">
-          <van-cell :title="city.cityName" @click="cityClick(city)" />
+          <van-cell :title="city.cityName" @click="backClick(city)" />
         </template>
       </template>
     </van-index-bar>

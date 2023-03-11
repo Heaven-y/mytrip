@@ -31,7 +31,7 @@ const isShowSearchBar = computed(() => {
 </script>
 
 <template>
-  <div class="home" ref="homeRef">
+  <div class="home tab-bar-Scroll" ref="homeRef">
     <search-bar v-show="isShowSearchBar" />
     <van-nav-bar title="晴天旅途" class="nav-bar" />
     <div class="banner">
@@ -44,12 +44,6 @@ const isShowSearchBar = computed(() => {
 </template>
 
 <style scoped lang="less">
-.home {
-  padding-bottom: 60px;
-  height: 100vh;
-  box-sizing: border-box;
-  overflow-y: auto;
-}
 .banner {
   img {
     width: 100%;

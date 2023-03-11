@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import useDetailStore from '@/stores/modules/detail'
 import useScroll from '@/hooks/useScroll'
@@ -16,21 +16,19 @@ import DetailMap from './c-cpns/detail-07-map.vue'
 import DetailIntro from './c-cpns/detail-08-intro.vue'
 
 import type { ComponentPublicInstance, VNodeRef } from 'vue'
+import useGoBack from '@/hooks/useGoback'
 
 const route = useRoute()
-const router = useRouter()
+const backClick = useGoBack(false, () => {
+  setTimeout(() => {
+    detailStore.$reset()
+  }, 0)
+})
 const houseId = route.params.houseId as string
 const detailStore = useDetailStore()
 detailStore.fetchDetailInfo(houseId)
 const { detailInfo } = storeToRefs(detailStore)
 const mainPart = computed(() => detailInfo.value.mainPart)
-
-function onBackClick() {
-  router.back()
-  setTimeout(() => {
-    detailStore.$reset()
-  }, 0)
-}
 
 const els = ref<any[]>([])
 const titles = ref<string[]>([])
@@ -87,7 +85,7 @@ function tabClick(index: number) {
       ref="controlRef"
       @tab-item-click="tabClick"
     />
-    <van-nav-bar title="房屋详情" left-text="旅途" left-arrow @click-left="onBackClick" />
+    <van-nav-bar title="房屋详情" left-text="旅途" left-arrow @click-left="backClick" />
     <div class="main" v-if="mainPart" v-memo="[mainPart]">
       <detail-swipe :swipe-data="mainPart.topModule.housePicture.housePics" />
       <detail-infos title="描述" :ref="getRef" :top-module="mainPart.topModule" />

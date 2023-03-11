@@ -1,19 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import useCityStore from '@/stores/modules/city'
 import CityGroup from './c-cpns/city-group.vue'
+import useGoBack from '@/hooks/useGoback'
 
 const cityStore = useCityStore()
 cityStore.fetchAllCities()
 const { allCities } = storeToRefs(cityStore)
 
-const router = useRouter()
 const searchValue = ref('')
-function onCancelClick() {
-  router.back()
-}
+const backClick = useGoBack()
 
 const tabActive = ref('')
 </script>
@@ -25,7 +22,7 @@ const tabActive = ref('')
       placeholder="城市/区域/位置"
       show-action
       shape="round"
-      @cancel="onCancelClick"
+      @cancel="backClick"
     />
 
     <van-tabs class="tabs" v-model:active="tabActive" color="#ff9854">
